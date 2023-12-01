@@ -4,4 +4,6 @@ from Target import Target
 gun=ArtilleryGun()
 target = Target()
 
-gun.firingBarrage(target, 5)
+for i in range(1, 300):
+    gun.firingBarrage(target, 5)
+# TODO an interactive firing mode
