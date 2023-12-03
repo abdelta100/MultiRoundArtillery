@@ -27,7 +27,6 @@ class ArtilleryGun:
         self.solutionAcquired=True
 
     def firingBarrage(self, target, num_rounds):
-        self.azimuthSeek()
 
         if not self.solutionAcquired and not self.acquiringSolution:
             calculatingSolution = threading.Thread(self.firingSolution(target, num_rounds))
@@ -41,6 +40,8 @@ class ArtilleryGun:
                 round.fire()
                 self.programmedRounds.remove(roundparams)
 
+        self.step(self.tick)
+
     def fire(self, round: ArtyRound):
         round.prep()
         round.fire()
@@ -48,9 +49,20 @@ class ArtilleryGun:
 
     def step(self, timestep):
         self.simCurrentTime+=timestep
+        self.azimuthSeek()
 
     def azimuthSeek(self):
         if len(self.programmedRounds)>0:
-            self.azimuth += self.rotationVelocity * self.tick
-            self.barrel.angle = self.azimuth
+            self.vertRotateBarrel(self.programmedRounds[0]['angle'])
         print(self.azimuth)
+
+    def vertRotateBarrel(self, angle):
+        #TODO make this more elegant
+        move_angle = angle-self.azimuth
+        try:
+            move_dir=move_angle/abs(move_angle)
+        except ZeroDivisionError:
+            move_dir=0
+        self.azimuth += min(move_angle,move_dir*self.rotationVelocity * self.tick)
+        self.barrel.angle = self.azimuth
+
